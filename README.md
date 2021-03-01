@@ -1,8 +1,16 @@
 # Kakao Arena Brunch Posts Recommendation System
+### Task
+- 브런치 유저가 2019년 2월 22일 이후로 볼 글 100개를 추천
+- 다음과 같은 형태로 예측
+```
+1 @wo-motivator133(유저 아이디) @wo-motivator134(추천 글 1) …
+2 @backcharcruz34 @artsbz23 …
+```
+
 
 ### Data Structure
 
-![data_structure](C:\Users\iloveslowfood\Documents\workspace\KakaoBrunchRS\images\data_structure.jpg)
+![data_structure](https://github.com/iloveslowfood/KakaoBrunchRS/blob/main/images/data_structure.jpg?raw=true)
 
 #### read: 본 글 정보
 - read.tar: 2018년 10월 1일부터 2019년 3월 1일까지 브런치 독자 일부가 본 글 정보가 3,625개의 파일로 구성
