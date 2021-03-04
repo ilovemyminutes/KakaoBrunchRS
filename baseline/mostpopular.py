@@ -33,10 +33,10 @@ class MostPopular(object):
         for path, _ in tqdm.tqdm(iterate_data_files(self.from_dtm, self.to_dtm),
                                  mininterval=1):
             for line in open(path):
-                seen = line.strip().split()[1:]
+                seen = line.strip().split()[1:] # 어떤 유저가 조회한 글 목록
                 for s in seen:
-                    freq[s] = freq.get(s, 0) + 1
-        freq = sorted(freq.items(), key=lambda x: x[1], reverse=True)
+                    freq[s] = freq.get(s, 0) + 1 # 등장한 글 하나씩 빈도 추가
+        freq = sorted(freq.items(), key=lambda x: x[1], reverse=True) # [(글, 빈도), ...] 형태의 빈도 리스트
         open(model_path, 'wb').write(cPickle.dumps(freq, 2))
         print('model built')
 
@@ -61,11 +61,11 @@ class MostPopular(object):
 
     def recommend(self, userlist_path, out_path):
         mp = self._get_model()
-        mp = [a for a, _ in mp]
+        mp = [a for a, _ in mp] # 글 목록
 
         with open(out_path, 'w') as fout:
             users = [u.strip() for u in open(userlist_path)]
-            seens = self._get_seens(users)
+            seens = self._get_seens(users) # 유저 목록의 각 유저들이 조회한 글을 딕셔너리 형태로 보여줌
             for user in users:
                 seen = set(seens.get(user, []))
                 recs = mp[:self.topn + len(seen)]
