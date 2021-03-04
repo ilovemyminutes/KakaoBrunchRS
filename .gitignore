@@ -1,6 +1,7 @@
 # data
 raw/*/*
 raw/*.csv
+raw/preprocessed/*.csv
 *.json
 
 # Byte-compiled / optimized / DLL files
