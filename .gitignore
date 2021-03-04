@@ -3,6 +3,7 @@ raw/*/*
 raw/*.csv
 raw/preprocessed/*.csv
 *.json
+baseline/tmp/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

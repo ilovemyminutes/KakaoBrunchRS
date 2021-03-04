@@ -19,7 +19,7 @@ class MostPopular(object):
         self.to_dtm = str(to_dtm)
         self.tmp_dir = tmp_dir
 
-    def _get_model_path(self):
+    def _get_model_path(self) -> str:
         model_path = os.path.join(self.tmp_dir, 'mp.model.%s.%s' % (self.from_dtm, self.to_dtm))
         return model_path
 
