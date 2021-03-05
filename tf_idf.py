@@ -1,24 +1,7 @@
 import copy
 import pandas as pd
 import numpy as np
-
-
-def squeeze(arr: list) -> list:
-    """2차원 리스트를 1차원으로 squeeze
-
-    Args:
-        arr (list): 2차원 리스트. 각 원소는 int, float, list 중 하나의 자료형을 가짐
-
-    Returns:
-        list: 1차원 리스트. 각 원소는 int 또는 float
-    """    
-    result = []
-    for l in arr:
-        if len(l) > 0 and isinstance(l, list):
-            result.extend(l)
-        elif not isinstance(l, list):
-            result.append(l)
-    return result
+from utils import squeeze
 
 
 def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFrame:
@@ -43,14 +26,14 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFra
     output = pd.DataFrame(np.zeros((sample.shape[0], vocab_size)), columns=vocab)
     
     kwd_list = set(squeeze(sample['keyword_list'].tolist()))
-    idf_vec = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
+    idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
     for tag in kwd_list:
-        idf_vec.loc[0, tag] = np.log(num_docs / sum(sample['keyword_list'].apply(lambda x: tag in x)))
-    output = output.apply(lambda x: onehot(x, sample), axis=1) * idf_vec.values
+        idf.loc[0, tag] = np.log(num_docs / sum(sample['keyword_list'].apply(lambda x: tag in x)))
+    output = output.apply(lambda x: _sparkle(x, sample), axis=1) * idf.values
     return output
 
 
-def onehot(sample_row: pd.DataFrame, sample):
+def _sparkle(sample_row: pd.DataFrame, sample):
     """boolean-type TF를 구하는 함수. get_tfidf() 내부에서 다음과 같은 형태로 활용
            
         output.apply(lambda x: onehot(x, sample), axis=1)
@@ -68,8 +51,7 @@ def onehot(sample_row: pd.DataFrame, sample):
     return sample_row
 
 
-
-# deprecated: 매우 느림
+# deprecated: too slow
 # def get_tfidf(data, vocab: list, indices: list=None, tf_type: str='boolean'):
 #     if isinstance(indices, int):
 #         indices = [indices]
