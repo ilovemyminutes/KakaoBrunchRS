@@ -2,6 +2,7 @@ import copy
 import pandas as pd
 import numpy as np
 
+
 def squeeze(arr: list) -> list:
     """2차원 리스트를 1차원으로 squeeze
 
@@ -26,7 +27,6 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFra
         - tf: boolean
         - idf: logarithmic
         - Reference: https://ko.wikipedia.org/wiki/Tf-idf
-
     Args:
         data (pd.DataFrame): 전체 데이터셋
         vocab (list): TF-IDF를 매길 태그 리스트
@@ -48,7 +48,6 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFra
         idf_vec.loc[0, tag] = np.log(num_docs / sum(sample['keyword_list'].apply(lambda x: tag in x)))
     output = output.apply(lambda x: onehot(x, sample), axis=1) * idf_vec.values
     return output
-
 
 
 def onehot(sample_row: pd.DataFrame, sample):
