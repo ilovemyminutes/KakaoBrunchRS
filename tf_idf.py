@@ -1,4 +1,5 @@
 import copy
+from tqdm import tqdm
 import pandas as pd
 import numpy as np
 from utils import squeeze
@@ -27,10 +28,14 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFra
     
     kwd_list = set(squeeze(batch['keyword_list'].tolist()))
     idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
-    for tag in kwd_list:
+
+    print('Build IDF...')
+    for tag in tqdm(kwd_list):
         if tag in vocab:
             idf.loc[0, tag] = np.log(num_docs / sum(batch['keyword_list'].apply(lambda x: tag in x)))
-    output = output.apply(lambda x: _sparkle(x, batch, vocab), axis=1) * idf.values
+
+    print('Build TF...')
+    output = output.progress_apply(lambda x: _sparkle(x, batch, vocab), axis=1) * idf.values
     return output
 
 
