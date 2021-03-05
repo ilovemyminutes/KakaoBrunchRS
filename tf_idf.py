@@ -22,18 +22,19 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFra
         indices = [indices]
     vocab_size = len(vocab)
     num_docs = data.shape[0]
-    sample = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
-    output = pd.DataFrame(np.zeros((sample.shape[0], vocab_size)), columns=vocab)
+    batch = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
+    output = pd.DataFrame(np.zeros((batch.shape[0], vocab_size)), columns=vocab)
     
-    kwd_list = set(squeeze(sample['keyword_list'].tolist()))
+    kwd_list = set(squeeze(batch['keyword_list'].tolist()))
     idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
     for tag in kwd_list:
-        idf.loc[0, tag] = np.log(num_docs / sum(sample['keyword_list'].apply(lambda x: tag in x)))
-    output = output.apply(lambda x: _sparkle(x, sample), axis=1) * idf.values
+        if tag in vocab:
+            idf.loc[0, tag] = np.log(num_docs / sum(batch['keyword_list'].apply(lambda x: tag in x)))
+    output = output.apply(lambda x: _sparkle(x, batch, vocab), axis=1) * idf.values
     return output
 
 
-def _sparkle(sample_row: pd.DataFrame, sample):
+def _sparkle(row: pd.DataFrame, batch: pd.DataFrame, vocab: list):
     """boolean-type TF를 구하는 함수. get_tfidf() 내부에서 다음과 같은 형태로 활용
            
         output.apply(lambda x: onehot(x, sample), axis=1)
@@ -45,10 +46,11 @@ def _sparkle(sample_row: pd.DataFrame, sample):
     Returns:
         [type]: [description]
     """    
-    idx = sample_row.name
-    for tag in sample['keyword_list'].iloc[idx]:
-        sample_row[tag] += 1
-    return sample_row
+    idx = row.name
+    for tag in batch['keyword_list'].iloc[idx]:
+        if tag in vocab:
+            row[tag] += 1
+    return row
 
 
 # deprecated: too slow
