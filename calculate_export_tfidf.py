@@ -3,7 +3,7 @@ import pandas as pd
 
 import fire
 
-from tf_idf import get_tfidf
+from tfidf import get_tfidf
 from load_data import load
 import config
 
