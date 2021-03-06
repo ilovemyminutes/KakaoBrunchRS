@@ -1,11 +1,14 @@
 import os
 import json
 from glob import glob
+
 import pandas as pd
 
+from config import Config
 
 
-def load(name: str = "magazine", root_dir: str = "../raw/"):
+
+def load(name: str = "magazine", root_dir: str = Config.data_root):
     PATH = {
         "magazine": os.path.join(root_dir, "magazine.json"),
         "metadata": os.path.join(root_dir, "metadata.json"),
