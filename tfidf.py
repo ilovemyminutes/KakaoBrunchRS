@@ -1,11 +1,36 @@
 import copy
 from tqdm import tqdm
+from glob import glob
 
 import pandas as pd
 import numpy as np
-from scipy.sparse import csr_matrix, save_npz
+from scipy.sparse import csr_matrix, save_npz, load_npz, vstack
+
 from utils import squeeze
 
+
+def load_tfidf(tfidf_dir: str, vocab_dir: str, post_meta_id_list: list) -> pd.DataFrame:
+    """tfidf 데이터프레임을 불러오는 함수
+
+    Args:
+        tfidf_dir (str): tfidf가 저장된 디렉토리
+        vocab_dir (str): vocabulary가 저장된 디렉토리
+        post_meta_id_list (list): tfidf 벡터를 추출할 post_meta_id 리스트
+
+    Returns:
+        pd.DataFrame: [description]
+    """    
+    if isinstance(post_meta_id_list, int):
+        post_meta_id_list = [post_meta_id_list]
+
+    tfidf = vstack([load_npz(split) for split in glob(os.path.join(tfidf_dir, '*'))])
+    vocab = pd.read_csv(vocab_dir)['tag'].tolist()
+    columns = ['post_meta_id'] + vocab
+    
+    output = pd.DataFrame(tfidf[post_meta_id_list, :].todense(), columns=columns)
+    output['post_meta_id'] = output['post_meta_id'].astype(int)
+
+    return output
 
 def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: str=None, encoding: str='euc-kr') -> pd.DataFrame:
     """tf-idf matrix를 리턴하는 함수. 서브샘플링을 통해 일부 데이터셋에 대해서만 tf-idf를 구할 수 있음
@@ -27,8 +52,8 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: 
     print(f'Getting TF-IDF from data...')
     num_docs = data.shape[0]
     batch = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
-    idf = get_idf(batch=batch, vocab=vocab, num_docs=num_docs)
-    tf = get_tf(batch=batch, vocab=vocab)
+    idf = _get_idf(batch=batch, vocab=vocab, num_docs=num_docs)
+    tf = _get_tf(batch=batch, vocab=vocab)
 
     print("Aggregating TF and IDF...")
     output = tf * idf.values # broad-casting
@@ -44,7 +69,7 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: 
         return output
 
 
-def get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
+def _get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
     """batch 데이터의 IDF 리턴
         - IDF 방식: logarithmic
         - Reference: https://ko.wikipedia.org/wiki/Tf-idf
@@ -74,7 +99,7 @@ def get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
     return idf
 
 
-def get_tf(batch: pd.DataFrame, vocab: list) -> pd.DataFrame:
+def _get_tf(batch: pd.DataFrame, vocab: list) -> pd.DataFrame:
     """batch 데이터의 tf를 리턴
         - tf 방식: boolean
         - Reference: https://ko.wikipedia.org/wiki/Tf-idf
