@@ -5,7 +5,7 @@ import numpy as np
 from utils import squeeze
 
 
-def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None) -> pd.DataFrame:
+def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: str=None, encoding: str='euc-kr') -> pd.DataFrame:
     """tf-idf matrix를 리턴하는 함수. 서브샘플링을 통해 일부 데이터셋에 대해서만 tf-idf를 구할 수 있음
     tf-idf 방식
         - tf: boolean
@@ -30,7 +30,16 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None) -> pd.DataF
 
     print("Aggregating TF and IDF...")
     output = tf * idf.values # broad-casting
-    return output
+
+    if save_path is not None:
+        print('Saving TF-IDF...', end='    ')
+        post_id_list = batch['post_id'].tolist()
+        output.index = post_id_list
+        output = output.reset_index().rename({'index': 'post_id'}, axis=1)
+        output.to_csv(save_path, encoding=encoding, index=False)
+        print(f'saved as "{save_path}"😎')
+    else:
+        return output
 
 
 def get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
