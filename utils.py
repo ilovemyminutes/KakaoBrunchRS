@@ -1,20 +1,24 @@
 import os
 import ast
-import config as conf
+from glob import glob
+
+import pandas as pd
+from scipy.sparse import load_npz, vstack
 
 
-def iterate_data_files(from_dtm, to_dtm):
-    from_dtm, to_dtm = map(str, [from_dtm, to_dtm])
-    read_root = os.path.join(conf.data_root, "read")
-    for fname in os.listdir(read_root):
-        if len(fname) != len("2018100100_2018100103"):
-            continue
-        if from_dtm != "None" and from_dtm > fname:
-            continue
-        if to_dtm != "None" and fname > to_dtm:
-            continue
-        path = os.path.join(read_root, fname)
-        yield path, fname
+def load_tfidf(tfidf_dir: str, vocab_dir: str, post_meta_id_list: list) -> pd.DataFrame:
+    if isinstance(post_meta_id_list, int):
+        post_meta_id_list = [post_meta_id_list]
+
+    tfidf = vstack([load_npz(split) for split in glob(os.path.join(tfidf_dir, '*'))])
+    vocab = pd.read_csv(vocab_dir)['tag'].tolist()
+    columns = ['post_meta_id'] + vocab
+    
+    output = pd.DataFrame(tfidf[post_meta_id_list, :].todense(), columns=columns)
+    output['post_meta_id'] = output['post_meta_id'].astype(int)
+
+    return output
+
 
 
 def str2list(strlist: str) -> list:
