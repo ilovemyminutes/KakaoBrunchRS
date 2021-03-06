@@ -24,6 +24,7 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: 
 
     num_docs = data.shape[0]
     batch = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
+    print(f'Getting TF-IDF from {indices[0]} to {indices[-1]} of data...')
 
     idf = get_idf(batch=batch, vocab=vocab, num_docs=num_docs)
     tf = get_tf(batch=batch, vocab=vocab)
