@@ -1,7 +1,9 @@
 import copy
 from tqdm import tqdm
+
 import pandas as pd
 import numpy as np
+from scipy.sparse import csr_matrix, save_npz
 from utils import squeeze
 
 
@@ -22,10 +24,9 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: 
     if isinstance(indices, int):
         indices = [indices]
 
+    print(f'Getting TF-IDF from data...')
     num_docs = data.shape[0]
     batch = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
-    print(f'Getting TF-IDF from {indices[0]} to {indices[-1]} of data...')
-
     idf = get_idf(batch=batch, vocab=vocab, num_docs=num_docs)
     tf = get_tf(batch=batch, vocab=vocab)
 
@@ -34,10 +35,10 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: 
 
     if save_path is not None:
         print('Saving TF-IDF...', end='    ')
-        post_id_list = batch['post_id'].tolist()
-        output.index = post_id_list
-        output = output.reset_index().rename({'index': 'post_id'}, axis=1)
-        output.to_csv(save_path, encoding=encoding, index=False)
+        output.index = indices
+        output = output.reset_index().rename({'index': 'post_meta_id'}, axis=1)
+        output_compressed = csr_matrix(output.values)
+        save_npz(save_path, output_compressed)
         print(f'saved as "{save_path}"😎')
     else:
         return output
