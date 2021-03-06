@@ -25,6 +25,7 @@ def load(name: str = "magazine", root_dir: str = "../raw/"):
         "read": os.path.join(root_dir, "read/*"),
     }
 
+    print('Loading data ...', end='    ')
     if name in ["magazine", "metadata", "users"]:
         data = pd.DataFrame(
             [json.loads(line) for line in open(PATH[name], "r", encoding="utf-8")]
@@ -48,5 +49,6 @@ def load(name: str = "magazine", root_dir: str = "../raw/"):
 
     else:
         raise NotImplementedError()
+    print('loaded!')
 
     return data
