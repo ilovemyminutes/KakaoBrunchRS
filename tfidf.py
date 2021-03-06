@@ -1,3 +1,4 @@
+import os
 import copy
 from tqdm import tqdm
 from glob import glob
@@ -9,7 +10,7 @@ from scipy.sparse import csr_matrix, save_npz, load_npz, vstack
 from utils import squeeze
 
 
-def load_tfidf(tfidf_dir: str, vocab_dir: str, post_meta_id_list: list) -> pd.DataFrame:
+def load_tfidf(post_meta_id_list: list, tfidf_dir: str, vocab_dir: str, drop_id: bool=True) -> pd.DataFrame:
     """tfidf 데이터프레임을 불러오는 함수
 
     Args:
@@ -28,9 +29,13 @@ def load_tfidf(tfidf_dir: str, vocab_dir: str, post_meta_id_list: list) -> pd.Da
     columns = ['post_meta_id'] + vocab
     
     output = pd.DataFrame(tfidf[post_meta_id_list, :].todense(), columns=columns)
-    output['post_meta_id'] = output['post_meta_id'].astype(int)
+    if drop_id:
+        output.drop('post_meta_id', axis=1, inplace=True)
+    else:
+        output['post_meta_id'] = output['post_meta_id'].astype(int)
 
     return output
+
 
 def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: str=None, encoding: str='euc-kr') -> pd.DataFrame:
     """tf-idf matrix를 리턴하는 함수. 서브샘플링을 통해 일부 데이터셋에 대해서만 tf-idf를 구할 수 있음

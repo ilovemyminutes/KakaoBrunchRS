@@ -1,4 +1,21 @@
+import os
 import ast
+from config import Config
+
+
+def iterate_data_files(from_dtm, to_dtm, root_dir: str=Config.data_root):
+    LENGTH = len('YYYYMMDDHH_YYYYMMDDHH')
+    from_dtm, to_dtm = map(str, [from_dtm, to_dtm])
+    read_root = os.path.join(root_dir, "read")
+    for fname in os.listdir(read_root):
+        if len(fname) != LENGTH:
+            continue
+        if from_dtm != "None" and from_dtm > fname:
+            continue
+        if to_dtm != "None" and fname > to_dtm:
+            continue
+        path = os.path.join(read_root, fname)
+        yield path, fname
 
 
 def str2list(strlist: str) -> list:
