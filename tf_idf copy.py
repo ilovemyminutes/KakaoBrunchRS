@@ -21,45 +21,23 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFra
     """    
     if isinstance(indices, int):
         indices = [indices]
-
+    vocab_size = len(vocab)
     num_docs = data.shape[0]
     batch = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
+    output = pd.DataFrame(np.zeros((batch.shape[0], vocab_size)), columns=vocab)
     
-    idf = get_idf(batch=batch, vocab=vocab, num_docs=num_docs)
-    tf = get_tf(batch=batch, vocab=vocab)
-    
-    print('Aggregating TF and IDF...')
-    output = tf * idf.values
-    return output
-
-def get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
-    vocab_size = len(vocab)
-    idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
-
     kwd_list = set(squeeze(batch['keyword_list'].tolist()))
     kwd_list_filtered = list(filter(lambda x: x in vocab, kwd_list))
-    
-    pbar = tqdm(kwd_list_filtered)
-    pbar.set_description('Getting IDF')
-    for tag in pbar:
-        if tag in vocab:
-            idf[tag] = np.log(num_docs) - np.log(sum(batch['keyword_list'].apply(lambda x: tag in x)))
 
-    return idf
+    idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
 
-def get_tf(batch, vocab) -> pd.DataFrame:
-    vocab_size =  len(vocab)
-    tf = pd.DataFrame(np.zeros((batch.shape[0], vocab_size)), columns=vocab)
+    print('Build IDF...')
+    for tag in tqdm(kwd_list_filtered):
+        idf.loc[0, tag] = np.log(num_docs / sum(batch['keyword_list'].apply(lambda x: tag in x)))
 
-    # split two cases because of vesion issue
-    try:
-        tqdm.pandas(desc='Getting TF')
-        tf = tf.progress_apply(lambda x: _sparkle(x, batch, vocab), axis=1)
-    except ImportError:
-        print('Getting TF...')
-        tf = tf.apply(lambda x: _sparkle(x, batch, vocab), axis=1)
-    
-    return tf
+    print('Build TF...')
+    output = output.progress_apply(lambda x: _sparkle(x, batch, vocab), axis=1) * idf.values
+    return output
 
 
 def _sparkle(row: pd.DataFrame, batch: pd.DataFrame, vocab: list):
