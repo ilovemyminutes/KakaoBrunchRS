@@ -1,34 +1,4 @@
-import os
 import ast
-from glob import glob
-
-import pandas as pd
-from scipy.sparse import load_npz, vstack
-
-
-def load_tfidf(tfidf_dir: str, vocab_dir: str, post_meta_id_list: list) -> pd.DataFrame:
-    """tfidf 데이터프레임을 불러오는 함수
-
-    Args:
-        tfidf_dir (str): tfidf가 저장된 디렉토리
-        vocab_dir (str): vocabulary가 저장된 디렉토리
-        post_meta_id_list (list): tfidf 벡터를 추출할 post_meta_id 리스트
-
-    Returns:
-        pd.DataFrame: [description]
-    """    
-    if isinstance(post_meta_id_list, int):
-        post_meta_id_list = [post_meta_id_list]
-
-    tfidf = vstack([load_npz(split) for split in glob(os.path.join(tfidf_dir, '*'))])
-    vocab = pd.read_csv(vocab_dir)['tag'].tolist()
-    columns = ['post_meta_id'] + vocab
-    
-    output = pd.DataFrame(tfidf[post_meta_id_list, :].todense(), columns=columns)
-    output['post_meta_id'] = output['post_meta_id'].astype(int)
-
-    return output
-
 
 
 def str2list(strlist: str) -> list:
