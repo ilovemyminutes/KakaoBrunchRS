@@ -4,16 +4,6 @@ from glob import glob
 import pandas as pd
 
 
-def get_read(path: str) -> pd.DataFrame:
-    read = pd.read_csv(path, header=None, names=["log"])
-    start_time = int(os.path.basename(path).split("_")[0])
-
-    read["user_private"] = read["log"].apply(lambda x: x.split()).apply(lambda x: x[0])
-    read["sequence"] = read["log"].apply(lambda x: x.split()).apply(lambda x: x[1:])
-    read["start_time"] = start_time
-
-    return read[["start_time", "user_private", "sequence"]]
-
 
 def load(name: str = "magazine", root_dir: str = "../raw/"):
     PATH = {
@@ -44,7 +34,7 @@ def load(name: str = "magazine", root_dir: str = "../raw/"):
 
     elif name == "read":
         data = pd.concat(
-            [get_read(path) for path in glob(PATH[name])], axis=0, ignore_index=True
+            [_get_read(path) for path in glob(PATH[name])], axis=0, ignore_index=True
         )
 
     else:
@@ -52,3 +42,14 @@ def load(name: str = "magazine", root_dir: str = "../raw/"):
     print('loaded!')
 
     return data
+
+
+def _get_read(path: str) -> pd.DataFrame:
+    read = pd.read_csv(path, header=None, names=["log"])
+    start_time = int(os.path.basename(path).split("_")[0])
+
+    read["user_private"] = read["log"].apply(lambda x: x.split()).apply(lambda x: x[0])
+    read["sequence"] = read["log"].apply(lambda x: x.split()).apply(lambda x: x[1:])
+    read["start_time"] = start_time
+
+    return read[["start_time", "user_private", "sequence"]]
