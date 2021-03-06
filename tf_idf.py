@@ -29,11 +29,23 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None) -> pd.DataF
     tf = get_tf(batch=batch, vocab=vocab)
 
     print("Aggregating TF and IDF...")
-    output = tf * idf.values
+    output = tf * idf.values # broad-casting
     return output
 
 
 def get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
+    """batch 데이터의 IDF 리턴
+        - IDF 방식: logarithmic
+        - Reference: https://ko.wikipedia.org/wiki/Tf-idf
+
+    Args:
+        batch (pd.DataFrame): metadata의 일부
+        vocab (list): IDF에 활용할 키워드 리스트
+        num_docs (int): metadata(모집단)의 모든 문서, 즉 행의 개수
+
+    Returns:
+        pd.DataFrame: (1, vocab 수) 크기의 IDF 행렬
+    """    
     vocab_size = len(vocab)
     idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
 
@@ -51,7 +63,18 @@ def get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
     return idf
 
 
-def get_tf(batch, vocab) -> pd.DataFrame:
+def get_tf(batch: pd.DataFrame, vocab: list) -> pd.DataFrame:
+    """batch 데이터의 tf를 리턴
+        - tf 방식: boolean
+        - Reference: https://ko.wikipedia.org/wiki/Tf-idf
+
+    Args:
+        batch (pd.DataFrame): metadata의 일부
+        vocab (list): TF에 활용할 키워드 리스트
+
+    Returns:
+        pd.DataFrame: (batch 데이터 row 수, vocab 수) 크기의 TF 행렬
+    """    
     vocab_size = len(vocab)
     tf = pd.DataFrame(np.zeros((batch.shape[0], vocab_size)), columns=vocab)
 
