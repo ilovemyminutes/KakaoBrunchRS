@@ -5,7 +5,7 @@ import numpy as np
 from utils import squeeze
 
 
-def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFrame:
+def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None) -> pd.DataFrame:
     """tf-idf matrix를 리턴하는 함수. 서브샘플링을 통해 일부 데이터셋에 대해서만 tf-idf를 구할 수 있음
     tf-idf 방식
         - tf: boolean
@@ -18,31 +18,35 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFra
 
     Returns:
         pd.DataFrame: 사이즈가 (data size, vocab_size)인 TF-IDF matrix
-    """    
+    """
     if isinstance(indices, int):
         indices = [indices]
     vocab_size = len(vocab)
     num_docs = data.shape[0]
     batch = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
     output = pd.DataFrame(np.zeros((batch.shape[0], vocab_size)), columns=vocab)
-    
-    kwd_list = set(squeeze(batch['keyword_list'].tolist()))
+
+    kwd_list = set(squeeze(batch["keyword_list"].tolist()))
     kwd_list_filtered = list(filter(lambda x: x in vocab, kwd_list))
 
     idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
 
-    print('Build IDF...')
+    print("Build IDF...")
     for tag in tqdm(kwd_list_filtered):
-        idf.loc[0, tag] = np.log(num_docs / sum(batch['keyword_list'].apply(lambda x: tag in x)))
+        idf.loc[0, tag] = np.log(
+            num_docs / sum(batch["keyword_list"].apply(lambda x: tag in x))
+        )
 
-    print('Build TF...')
-    output = output.progress_apply(lambda x: _sparkle(x, batch, vocab), axis=1) * idf.values
+    print("Build TF...")
+    output = (
+        output.progress_apply(lambda x: _sparkle(x, batch, vocab), axis=1) * idf.values
+    )
     return output
 
 
 def _sparkle(row: pd.DataFrame, batch: pd.DataFrame, vocab: list):
     """boolean-type TF를 구하는 함수. get_tfidf() 내부에서 다음과 같은 형태로 활용
-           
+
         output.apply(lambda x: onehot(x, sample), axis=1)
 
     Args:
@@ -51,9 +55,9 @@ def _sparkle(row: pd.DataFrame, batch: pd.DataFrame, vocab: list):
 
     Returns:
         [type]: [description]
-    """    
+    """
     idx = row.name
-    for tag in batch['keyword_list'].iloc[idx]:
+    for tag in batch["keyword_list"].iloc[idx]:
         if tag in vocab:
             row[tag] += 1
     return row

@@ -5,16 +5,17 @@ import config as conf
 
 def iterate_data_files(from_dtm, to_dtm):
     from_dtm, to_dtm = map(str, [from_dtm, to_dtm])
-    read_root = os.path.join(conf.data_root, 'read')
+    read_root = os.path.join(conf.data_root, "read")
     for fname in os.listdir(read_root):
-        if len(fname) != len('2018100100_2018100103'):
+        if len(fname) != len("2018100100_2018100103"):
             continue
-        if from_dtm != 'None' and from_dtm > fname:
+        if from_dtm != "None" and from_dtm > fname:
             continue
-        if to_dtm != 'None' and fname > to_dtm:
+        if to_dtm != "None" and fname > to_dtm:
             continue
         path = os.path.join(read_root, fname)
         yield path, fname
+
 
 def str2list(strlist: str) -> list:
     """문자열 형태의 리스트를 리스트로 인식되도록 하는 함수
@@ -25,7 +26,7 @@ def str2list(strlist: str) -> list:
 
     Returns:
         list: 리스트 타입으로 인식된 리스트
-    """    
+    """
     listed = ast.literal_eval(strlist)
     return listed
 
@@ -38,7 +39,7 @@ def squeeze(arr: list) -> list:
 
     Returns:
         list: 1차원 리스트. 각 원소는 int 또는 float
-    """    
+    """
     result = []
     for l in arr:
         if len(l) > 0 and isinstance(l, list):

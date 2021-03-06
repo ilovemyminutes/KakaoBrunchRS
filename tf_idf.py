@@ -5,7 +5,7 @@ import numpy as np
 from utils import squeeze
 
 
-def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFrame:
+def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None) -> pd.DataFrame:
     """tf-idf matrix를 리턴하는 함수. 서브샘플링을 통해 일부 데이터셋에 대해서만 tf-idf를 구할 수 있음
     tf-idf 방식
         - tf: boolean
@@ -18,53 +18,57 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list=None) -> pd.DataFra
 
     Returns:
         pd.DataFrame: 사이즈가 (data size, vocab_size)인 TF-IDF matrix
-    """    
+    """
     if isinstance(indices, int):
         indices = [indices]
 
     num_docs = data.shape[0]
     batch = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
-    
+
     idf = get_idf(batch=batch, vocab=vocab, num_docs=num_docs)
     tf = get_tf(batch=batch, vocab=vocab)
-    
-    print('Aggregating TF and IDF...')
+
+    print("Aggregating TF and IDF...")
     output = tf * idf.values
     return output
+
 
 def get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
     vocab_size = len(vocab)
     idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
 
-    kwd_list = set(squeeze(batch['keyword_list'].tolist()))
+    kwd_list = set(squeeze(batch["keyword_list"].tolist()))
     kwd_list_filtered = list(filter(lambda x: x in vocab, kwd_list))
-    
+
     pbar = tqdm(kwd_list_filtered)
-    pbar.set_description('Getting IDF')
+    pbar.set_description("Getting IDF")
     for tag in pbar:
         if tag in vocab:
-            idf[tag] = np.log(num_docs) - np.log(sum(batch['keyword_list'].apply(lambda x: tag in x)))
+            idf[tag] = np.log(num_docs) - np.log(
+                sum(batch["keyword_list"].apply(lambda x: tag in x))
+            )
 
     return idf
 
+
 def get_tf(batch, vocab) -> pd.DataFrame:
-    vocab_size =  len(vocab)
+    vocab_size = len(vocab)
     tf = pd.DataFrame(np.zeros((batch.shape[0], vocab_size)), columns=vocab)
 
     # split two cases because of vesion issue
     try:
-        tqdm.pandas(desc='Getting TF')
+        tqdm.pandas(desc="Getting TF")
         tf = tf.progress_apply(lambda x: _sparkle(x, batch, vocab), axis=1)
     except ImportError:
-        print('Getting TF...')
+        print("Getting TF...")
         tf = tf.apply(lambda x: _sparkle(x, batch, vocab), axis=1)
-    
+
     return tf
 
 
 def _sparkle(row: pd.DataFrame, batch: pd.DataFrame, vocab: list):
     """boolean-type TF를 구하는 함수. get_tfidf() 내부에서 다음과 같은 형태로 활용
-           
+
         output.apply(lambda x: onehot(x, sample), axis=1)
 
     Args:
@@ -73,9 +77,9 @@ def _sparkle(row: pd.DataFrame, batch: pd.DataFrame, vocab: list):
 
     Returns:
         [type]: [description]
-    """    
+    """
     idx = row.name
-    for tag in batch['keyword_list'].iloc[idx]:
+    for tag in batch["keyword_list"].iloc[idx]:
         if tag in vocab:
             row[tag] += 1
     return row

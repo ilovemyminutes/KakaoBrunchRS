@@ -38,7 +38,7 @@ def _map(recs, gt, topn):
         for i, r in enumerate(rec):
             if r in seen:
                 correct += 1
-                _ap += (correct / (i + 1.0))
+                _ap += correct / (i + 1.0)
         _ap /= min(len(seen), len(rec))
         ap += _ap
         n += 1.0
@@ -72,10 +72,10 @@ def evaluate(recs_path, dev_path, topn=100):
         userid, seen = tkns[0], tkns[1:]
         gt[userid] = seen
 
-    print('MAP@%s: %s' % (topn, _map(recs, gt, topn)))
-    print('NDCG@%s: %s' % (topn, _ndcg(recs, gt)))
-    print('EntDiv@%s: %s' % (topn, _entropy_diversity(recs, topn)))
+    print("MAP@%s: %s" % (topn, _map(recs, gt, topn)))
+    print("NDCG@%s: %s" % (topn, _ndcg(recs, gt)))
+    print("EntDiv@%s: %s" % (topn, _entropy_diversity(recs, topn)))
 
 
-if __name__ == '__main__':
-    fire.Fire({'run': evaluate})
+if __name__ == "__main__":
+    fire.Fire({"run": evaluate})
