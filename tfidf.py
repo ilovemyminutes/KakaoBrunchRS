@@ -24,7 +24,7 @@ def load_tfidf(post_meta_id_list: list, tfidf_dir: str, vocab_dir: str, drop_id:
     if isinstance(post_meta_id_list, int):
         post_meta_id_list = [post_meta_id_list]
 
-    tfidf = vstack([load_npz(split) for split in glob(os.path.join(tfidf_dir, '*'))])
+    tfidf = load_npz(tfidf_dir)
     vocab = pd.read_csv(vocab_dir)['tag'].tolist()
     columns = ['post_meta_id'] + vocab
     
