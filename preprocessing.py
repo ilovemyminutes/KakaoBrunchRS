@@ -2,7 +2,7 @@ from tqdm import tqdm
 from collections import defaultdict, ChainMap
 
 import pandas as pd
-import fire
+# import fire
 
 from config import DataRoots
 from load_data import load_raw, load_post_id_encoder
@@ -95,4 +95,4 @@ class UserLogsGenerator:
 
 
 if __name__ == "__main__":
-    fire.Fire({"preprocess_read": reconstruct_reads_by_user})
+    fire.Fire({"generate": UserLogsGenerator})
