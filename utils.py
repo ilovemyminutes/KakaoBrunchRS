@@ -1,18 +1,28 @@
 import os
 import ast
+import json
 import pickle
-from config import Config
 
-LENGTH = len('YYYYMMDDHH_YYYYMMDDHH')
+from config import DataRoots
+
+LENGTH = len("YYYYMMDDHH_YYYYMMDDHH")
 
 
-def save_pickle(f: object, save_path: str) -> None:
-    with open(save_path, 'wb') as handle:
+def save_as_pickle(f: object, save_path: str) -> None:
+    with open(save_path, "wb") as handle:
         pickle.dump(f, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    print(f'{f} saved in {save_path} successfuly.')
+    print(f"{f} saved in {save_path} successfuly.")
 
 
-def iterate_data_files(from_dtm, to_dtm, root_dir: str=Config.data_root):
+def save_as_json(f: object, save_path: str) -> None:
+    with open(save_path, "w") as path:
+        json.dump(
+            f,
+            path,
+        )
+
+
+def iterate_data_files(from_dtm, to_dtm, root_dir: str = DataRoots.raw):
     from_dtm, to_dtm = map(str, [from_dtm, to_dtm])
     read_root = os.path.join(root_dir, "read")
     for fname in os.listdir(read_root):
