@@ -1,14 +1,14 @@
 import os
 import json
+import pickle
 from glob import glob
 
 import pandas as pd
 
-from config import Config
+from config import DataRoots
 
 
-
-def load(name: str = "magazine", root_dir: str = Config.data_root):
+def load_raw(name: str = "magazine", root_dir: str = DataRoots.raw):
     PATH = {
         "magazine": os.path.join(root_dir, "magazine.json"),
         "metadata": os.path.join(root_dir, "metadata.json"),
@@ -18,7 +18,7 @@ def load(name: str = "magazine", root_dir: str = Config.data_root):
         "read": os.path.join(root_dir, "read/*"),
     }
 
-    print(f'Loading {name} data ...', end='    ')
+    print(f"Loading {name} data ...", end="    ")
     if name in ["magazine", "metadata", "users"]:
         data = pd.DataFrame(
             [json.loads(line) for line in open(PATH[name], "r", encoding="utf-8")]
@@ -36,15 +36,30 @@ def load(name: str = "magazine", root_dir: str = Config.data_root):
         data = pd.read_csv(PATH[name], header=None, names=["user_private"])
 
     elif name == "read":
-        data = pd.concat(
-            [_get_read(path) for path in glob(PATH[name])], axis=0, ignore_index=True
-        )
+        try:
+            data = pd.concat(
+                [_get_read(path) for path in glob(PATH[name])], axis=0, ignore_index=True
+            )
+        except ValueError:
+            raise ValueError('Wrong directory.')
 
     else:
         raise NotImplementedError()
-    print('loaded!')
+    print("loaded!")
 
     return data
+
+
+def load_post_id_encoder(encoder_dir: str) -> dict:
+    with open(encoder_dir, "rb") as handle:
+        post_id_encoder = pickle.load(handle)
+    return post_id_encoder
+
+
+def load_post_id_decoder(decoder_dir: str) -> dict:
+    with open(decoder_dir, "rb") as handle:
+        post_id_decoder = pickle.load(handle)
+    return post_id_decoder
 
 
 def _get_read(path: str) -> pd.DataFrame:

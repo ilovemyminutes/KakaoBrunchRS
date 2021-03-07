@@ -1,3 +1,4 @@
+import os
 import copy
 from tqdm import tqdm
 from glob import glob
@@ -9,7 +10,9 @@ from scipy.sparse import csr_matrix, save_npz, load_npz, vstack
 from utils import squeeze
 
 
-def load_tfidf(tfidf_dir: str, vocab_dir: str, post_meta_id_list: list) -> pd.DataFrame:
+def load_tfidf(
+    post_meta_id_list: list, tfidf_dir: str, vocab_dir: str, drop_id: bool = True
+) -> pd.DataFrame:
     """tfidf 데이터프레임을 불러오는 함수
 
     Args:
@@ -19,20 +22,30 @@ def load_tfidf(tfidf_dir: str, vocab_dir: str, post_meta_id_list: list) -> pd.Da
 
     Returns:
         pd.DataFrame: [description]
-    """    
+    """
     if isinstance(post_meta_id_list, int):
         post_meta_id_list = [post_meta_id_list]
 
-    tfidf = vstack([load_npz(split) for split in glob(os.path.join(tfidf_dir, '*'))])
-    vocab = pd.read_csv(vocab_dir)['tag'].tolist()
-    columns = ['post_meta_id'] + vocab
-    
+    tfidf = load_npz(tfidf_dir)
+    vocab = pd.read_csv(vocab_dir)["tag"].tolist()
+    columns = ["post_meta_id"] + vocab
+
     output = pd.DataFrame(tfidf[post_meta_id_list, :].todense(), columns=columns)
-    output['post_meta_id'] = output['post_meta_id'].astype(int)
+    if drop_id:
+        output.drop("post_meta_id", axis=1, inplace=True)
+    else:
+        output["post_meta_id"] = output["post_meta_id"].astype(int)
 
     return output
 
-def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: str=None, encoding: str='euc-kr') -> pd.DataFrame:
+
+def get_tfidf(
+    data: pd.DataFrame,
+    vocab: list,
+    indices: list = None,
+    save_path: str = None,
+    encoding: str = "euc-kr",
+) -> pd.DataFrame:
     """tf-idf matrix를 리턴하는 함수. 서브샘플링을 통해 일부 데이터셋에 대해서만 tf-idf를 구할 수 있음
     tf-idf 방식
         - tf: boolean
@@ -49,19 +62,19 @@ def get_tfidf(data: pd.DataFrame, vocab: list, indices: list = None, save_path: 
     if isinstance(indices, int):
         indices = [indices]
 
-    print(f'Getting TF-IDF from data...')
+    print(f"Getting TF-IDF from data...")
     num_docs = data.shape[0]
     batch = copy.deepcopy(data) if indices is None else data.iloc[indices, :]
     idf = _get_idf(batch=batch, vocab=vocab, num_docs=num_docs)
     tf = _get_tf(batch=batch, vocab=vocab)
 
     print("Aggregating TF and IDF...")
-    output = tf * idf.values # broad-casting
+    output = tf * idf.values  # broad-casting
 
     if save_path is not None:
-        print('Saving TF-IDF...', end='    ')
+        print("Saving TF-IDF...", end="    ")
         output.index = indices
-        output = output.reset_index().rename({'index': 'post_meta_id'}, axis=1)
+        output = output.reset_index().rename({"index": "post_meta_id"}, axis=1)
         output_compressed = csr_matrix(output.values)
         save_npz(save_path, output_compressed)
         print(f'saved as "{save_path}"😎')
@@ -81,7 +94,7 @@ def _get_idf(batch: pd.DataFrame, vocab: list, num_docs: int) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: (1, vocab 수) 크기의 IDF 행렬
-    """    
+    """
     vocab_size = len(vocab)
     idf = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
 
@@ -110,7 +123,7 @@ def _get_tf(batch: pd.DataFrame, vocab: list) -> pd.DataFrame:
 
     Returns:
         pd.DataFrame: (batch 데이터 row 수, vocab 수) 크기의 TF 행렬
-    """    
+    """
     vocab_size = len(vocab)
     tf = pd.DataFrame(np.zeros((batch.shape[0], vocab_size)), columns=vocab)
 
