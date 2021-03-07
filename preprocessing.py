@@ -1,5 +1,5 @@
 from tqdm import tqdm
-from collections import defaultdict
+from collections import defaultdict, ChainMap
 
 import pandas as pd
 import fire
@@ -31,24 +31,28 @@ class UserLogsGenerator:
         self, user_list: list, save_path: str = None
     ) -> pd.DataFrame:
         
-        user_logs = defaultdict()
+        user_logs = defaultdict(dict)
         for user in tqdm(user_list):
-            logs = self.__reads.loc[self.__reads["user_private"] == user].drop(
+            logs_raw = self.__reads.loc[self.__reads["user_private"] == user].drop(
                 "user_private", axis=1
             )
-            logs = logs.apply(
+            logs_raw = logs_raw.apply(
                 lambda x: {
                     x[self.DATE]: self._encode_post_id_sequence(x[self.SEQUENCE], self.__encoder)
                 },
                 axis=1,
             ).tolist()
-        user_logs[user].append(logs)
+            logs = dict(ChainMap(*logs_raw))
+        user_logs[user] = logs
 
         if save_path:
             save_as_json(user_logs, save_path)
+            return user_logs
+        else:
+            return user_logs
 
     @staticmethod
-    def _encode_post_id_sequence(sequence: str, encoder: str):
+    def _encode_post_id_sequence(sequence: list, encoder: dict):
         post_id_sequence = [encoder[x] for x in sequence if x in encoder.keys()]
         return post_id_sequence
 
