@@ -1,4 +1,7 @@
 # Kakao Arena Brunch Posts Recommendation System
+### Ongoing
+![](https://github.com/iloveslowfood/KakaoBrunchRS/blob/main/images/structure.jpg?raw=true)
+
 ### Task
 - 브런치 유저가 2019년 2월 22일 이후로 볼 글 100개를 추천
 - 다음과 같은 형태로 예측
