@@ -36,9 +36,12 @@ def load_raw(name: str = "magazine", root_dir: str = DataRoots.raw):
         data = pd.read_csv(PATH[name], header=None, names=["user_private"])
 
     elif name == "read":
-        data = pd.concat(
-            [_get_read(path) for path in glob(PATH[name])], axis=0, ignore_index=True
-        )
+        try:
+            data = pd.concat(
+                [_get_read(path) for path in glob(PATH[name])], axis=0, ignore_index=True
+            )
+        except ValueError:
+            raise ValueError('Wrong directory.')
 
     else:
         raise NotImplementedError()
