@@ -10,9 +10,15 @@ from utils import save_as_json
 
 
 class UserLogsGenerator:
+
+    DATE, SEQUENCE = 0, 1
+
     def __init__(
-        self, read_path: str = DataRoots.raw, post_enc_path: str = DataRoots.post_id_enc
-    ):
+        self, read_path: str = DataRoots.raw, post_enc_path: str = DataRoots.post_id_enc, period: tuple= None
+    ):  
+        if period is not None:
+            raise NotImplementedError()
+
         self.read_path = read_path
         self.post_enc_path = post_enc_path
 
@@ -20,10 +26,11 @@ class UserLogsGenerator:
         self.__encoder = load_post_id_encoder(post_enc_path)
         self.__user_list = self.__reads["user_private"].unique().tolist()
 
+        
     def get_user_log(
-        self, user_list: list, period: tuple, save_path: str = None
+        self, user_list: list, save_path: str = None
     ) -> pd.DataFrame:
-        DATE, SEQUENCE = 0, 1
+        
         user_logs = defaultdict()
         for user in tqdm(user_list):
             logs = self.__reads.loc[self.__reads["user_private"] == user].drop(
@@ -31,7 +38,7 @@ class UserLogsGenerator:
             )
             logs = logs.apply(
                 lambda x: {
-                    x[DATE]: self._encode_post_id_sequence(x[SEQUENCE], self.__encoder)
+                    x[self.DATE]: self._encode_post_id_sequence(x[self.SEQUENCE], self.__encoder)
                 },
                 axis=1,
             ).tolist()
