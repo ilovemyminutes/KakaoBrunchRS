@@ -8,7 +8,7 @@ from config import Config
 
 
 
-def load(name: str = "magazine", root_dir: str = Config.data_root):
+def load_raw(name: str = "magazine", root_dir: str = Config.data_root):
     PATH = {
         "magazine": os.path.join(root_dir, "magazine.json"),
         "metadata": os.path.join(root_dir, "metadata.json"),
@@ -45,6 +45,18 @@ def load(name: str = "magazine", root_dir: str = Config.data_root):
     print('loaded!')
 
     return data
+
+
+def load_post_id_encoder(encoder_dir: str) -> dict:
+    with open(encoder_dir, 'rb') as handle:
+        post_id_encoder = pickle.load(handle)
+    return post_id_encoder
+
+
+def load_post_id_decoder(decoder_dir: str) -> dict:
+    with open(decoder_dir, 'rb') as handle:
+        post_id_decoder = pickle.load(handle)
+    return post_id_decoder
 
 
 def _get_read(path: str) -> pd.DataFrame:

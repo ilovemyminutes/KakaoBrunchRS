@@ -4,7 +4,10 @@ from dataclasses import dataclass
 # vocab_root = '../raw/preprocessed/tag_vocab7000.csv'
 
 @dataclass
-class Config:
-    data_root: str="./raw"
-    tfidf_root: str='../raw/preprocessed/metadata_tfidf/metadata_tfidf_vocab7000_aggregation.npz'
-    vocab_root: str='../raw/preprocessed/tag_vocab7000.csv'
+class DataRoots:
+    data: str="./raw"
+    tfidf: str='../raw/preprocessed/metadata_tfidf/metadata_tfidf_vocab7000_aggregation.npz'
+    vocab: str='../raw/preprocessed/tag_vocab7000.csv'
+    post_id_dec: str='../raw/preprocessed/post_id_decoding.pickle'
+    post_id_enc: str='../raw/preprocessed/post_id_encoding.pickle'
+    

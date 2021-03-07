@@ -3,15 +3,8 @@ import ast
 import pickle
 from config import Config
 
-def load_post_id_encoder(encoder_dir: str) -> dict:
-    with open(encoder_dir, 'rb') as handle:
-        post_id_encoder = pickle.load(handle)
-    return post_id_encoder
+LENGTH = len('YYYYMMDDHH_YYYYMMDDHH')
 
-def load_post_id_decoder(decoder_dir: str) -> dict:
-    with open(decoder_dir, 'rb') as handle:
-        post_id_decoder = pickle.load(handle)
-    return post_id_decoder
 
 def save_pickle(f: object, save_path: str) -> None:
     with open(save_path, 'wb') as handle:
@@ -20,7 +13,6 @@ def save_pickle(f: object, save_path: str) -> None:
 
 
 def iterate_data_files(from_dtm, to_dtm, root_dir: str=Config.data_root):
-    LENGTH = len('YYYYMMDDHH_YYYYMMDDHH')
     from_dtm, to_dtm = map(str, [from_dtm, to_dtm])
     read_root = os.path.join(root_dir, "read")
     for fname in os.listdir(read_root):
