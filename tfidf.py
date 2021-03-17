@@ -16,6 +16,7 @@ class TFIDFGenerator:
     def __init__(self, root_dir: str=Config.tfidf_dir):
         self.__vocab = self.__load_vocab(root_dir)
         self.__tfidf = self.__load_tfidf(root_dir)
+        self.__df = self.__load_df(root_dir)
         self.__columns = ["post_meta_id"] + self.__vocab
 
     def generate(self, post_meta_id_list: list, drop_id: bool=True) -> pd.DataFrame:
@@ -36,6 +37,12 @@ class TFIDFGenerator:
             output["post_meta_id"] = output["post_meta_id"].astype(int)
         return output
 
+    def __load_df(self, root_dir):
+        fpath = os.path.join(root_dir, Config.df)
+        with open(fpath, 'rb') as df7000:
+            df = pickle.load(df7000)
+        return df
+
     def __load_tfidf(self, root_dir):
         fpath = os.path.join(root_dir, Config.tfidf)
         tfidf = load_npz(fpath)
@@ -50,6 +57,12 @@ class TFIDFGenerator:
     @property
     def TFIDF(self):
         return self.__tfidf
+
+    @property
+    def DF(self):
+        df = pd.DataFrame(self.__df).T
+        df.columns = self.__vocab
+        return df
 
     @property
     def Vocab(self):

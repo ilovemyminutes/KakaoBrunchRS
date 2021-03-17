@@ -11,7 +11,7 @@ LENGTH = len("YYYYMMDDHH_YYYYMMDDHH")
 def save_as_pickle(f: object, save_path: str) -> None:
     with open(save_path, "wb") as handle:
         pickle.dump(f, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    print(f"{f} saved in {save_path} successfuly.")
+    print(f"Saved in {save_path} successfuly.")
 
 
 def save_as_json(f: object, save_path: str) -> None:
