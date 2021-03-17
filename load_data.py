@@ -63,6 +63,10 @@ def load_post_id_decoder(decoder_dir: str) -> dict:
         post_id_decoder = pickle.load(handle)
     return post_id_decoder
 
+def load_user_time_read(root_dir: str) -> dict:
+    with open(root_dir, "r") as json_file:
+        output = json.load(json_file)
+    return output
 
 def _get_read(path: str) -> pd.DataFrame:
     read = pd.read_csv(path, header=None, names=["log"])

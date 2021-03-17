@@ -191,6 +191,7 @@ mistune==0.8.4
 mizani==0.6.0
 mkl==2019.0
 mlxtend==0.14.0
+mmh3==3.0.0
 more-itertools==8.7.0
 moviepy==0.2.3.5
 mpmath==1.2.1

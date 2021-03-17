@@ -1,7 +1,8 @@
 # data
 raw/*/*
 raw/*.csv
-raw/preprocessed/*.csv
+preprocessed/*
+preprocessed/*/*
 *.json
 baseline/tmp/*
 tmp/*
