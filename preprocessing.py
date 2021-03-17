@@ -2,7 +2,7 @@ from tqdm import tqdm
 from collections import defaultdict, ChainMap
 
 import pandas as pd
-# import fire
+import fire
 
 from config import DataRoots
 from load_data import load_raw, load_post_id_encoder
