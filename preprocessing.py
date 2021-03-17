@@ -8,8 +8,6 @@ from load_data import load_raw, load_post_id_encoder
 from utils import save_as_json
 
 
-
-
 def reconstruct_reads_by_user(
     read_path: str = DataRoots.raw,
     post_enc_path: str = DataRoots.post_id_enc,
