@@ -3,7 +3,7 @@ import ast
 import json
 import pickle
 
-from config import DataRoots
+from config import Config
 
 LENGTH = len("YYYYMMDDHH_YYYYMMDDHH")
 
@@ -22,7 +22,7 @@ def save_as_json(f: object, save_path: str) -> None:
         )
 
 
-def iterate_data_files(from_dtm, to_dtm, root_dir: str = DataRoots.raw):
+def iterate_data_files(from_dtm, to_dtm, root_dir: str = Config.raw_dir):
     from_dtm, to_dtm = map(str, [from_dtm, to_dtm])
     read_root = os.path.join(root_dir, "read")
     for fname in os.listdir(read_root):

@@ -6,7 +6,7 @@ from collections import defaultdict, ChainMap
 import pandas as pd
 import fire
 
-from config import DataRoots
+from config import Config
 from load_data import load_raw
 from utils import save_as_json
 
@@ -102,5 +102,5 @@ class PostIdEncoder:
 #         return self.__user_list
 
 
-if __name__ == "__main__":
-    fire.Fire({"generate": UserLogsGenerator})
+# if __name__ == "__main__":
+#     fire.Fire({"generate": UserLogsGenerator})

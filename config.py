@@ -6,15 +6,11 @@ from dataclasses import dataclass
 
 
 @dataclass
-class DataRoots:
-    raw: str = "./raw"
-    tfidf: str = (
-        "./tfidf"
-    )
+class Config:
+    raw_dir: str = "./raw"
     user_time_read: str = "./preprocessed/user_time_read.json"
-    vocab: str = "./preprocessed/tag_vocab7000.csv"
     post_id_encoder: str = "./encodings/post_id_decoding.pickle"
 
-class TFIDF:
+    tfidf_dir: str = "./tfidf"
     tfidf: str = 'metadata_tfidf_vocab7000_aggregation.npz'
-    tag7000: str = 'tag_vocab7000.pkl'
+    vocab: str = 'tag_vocab7000.pkl'

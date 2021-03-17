@@ -5,10 +5,10 @@ from glob import glob
 
 import pandas as pd
 
-from config import DataRoots
+from config import Config
 
 
-def load_raw(name: str = "magazine", root_dir: str = DataRoots.raw):
+def load_raw(name: str = "magazine", root_dir: str = Config.raw_dir):
     PATH = {
         "magazine": os.path.join(root_dir, "magazine.json"),
         "metadata": os.path.join(root_dir, "metadata.json"),
@@ -50,6 +50,24 @@ def load_raw(name: str = "magazine", root_dir: str = DataRoots.raw):
     print("loaded!")
 
     return data
+
+
+def _get_read(path: str) -> pd.DataFrame:
+    read = pd.read_csv(path, header=None, names=["log"])
+    start_time = int(os.path.basename(path).split("_")[0])
+
+    read["user_private"] = read["log"].apply(lambda x: x.split()).apply(lambda x: x[0])
+    read["sequence"] = read["log"].apply(lambda x: x.split()).apply(lambda x: x[1:])
+    read["start_time"] = start_time
+
+    return read[["start_time", "user_private", "sequence"]]
+
+
+def load_user_time_read(root_dir: str) -> dict:
+    with open(root_dir, "r") as json_file:
+        output = json.load(json_file)
+    return output
+
 
 # class PostIdEncoder:
 #     def __init__(self, root_dir: str) -> dict:
@@ -97,17 +115,3 @@ def load_raw(name: str = "magazine", root_dir: str = DataRoots.raw):
 #         post_id_decoder = pickle.load(handle)
 #     return post_id_decoder
 
-def load_user_time_read(root_dir: str) -> dict:
-    with open(root_dir, "r") as json_file:
-        output = json.load(json_file)
-    return output
-
-def _get_read(path: str) -> pd.DataFrame:
-    read = pd.read_csv(path, header=None, names=["log"])
-    start_time = int(os.path.basename(path).split("_")[0])
-
-    read["user_private"] = read["log"].apply(lambda x: x.split()).apply(lambda x: x[0])
-    read["sequence"] = read["log"].apply(lambda x: x.split()).apply(lambda x: x[1:])
-    read["start_time"] = start_time
-
-    return read[["start_time", "user_private", "sequence"]]
