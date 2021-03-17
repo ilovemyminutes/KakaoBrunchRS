@@ -2,18 +2,40 @@ import os
 import copy
 from tqdm import tqdm
 from glob import glob
+import pickle
 
 import pandas as pd
 import numpy as np
 from scipy.sparse import csr_matrix, save_npz, load_npz, vstack
 
 from utils import squeeze
-from config import Config
+from config import DataRoots, TFIDF
 
 class TFIDFGenerator:
-    def __init__(self, root_dir):
-        self.__vocab = pd.read_csv(os.path)
+    def __init__(self, root_dir: str=DataRoots.tfidf):
+        self.__vocab = self.__load_vocab(root_dir)
+        self.__tfidf = self.__load_tfidf(root_dir)
+        self.__columns = ["post_meta_id"] + self.__vocab
 
+    def generate(self, post_meta_id_list: list, drop_id: bool=True) -> pd.DataFrame:
+        output = pd.DataFrame(self.__tfidf[post_meta_id_list, :].todense(), columns=self.__columns)
+
+        if drop_id:
+            output.drop("post_meta_id", axis=1, inplace=True)
+        else:
+            output["post_meta_id"] = output["post_meta_id"].astype(int)
+        return output
+
+    def __load_tfidf(self, root_dir):
+        fpath = os.path.join(root_dir, TFIDF.tfidf)
+        tfidf = load_npz(fpath)
+        return tfidf
+
+    def __load_vocab(self, root_dir):
+        fpath = os.path.join(root_dir, TFIDF.tag7000)
+        with open(fpath, "rb") as tag7000:
+            vocab = pickle.load(tag7000)
+        return vocab
 
 
 def load_tfidf(

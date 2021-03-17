@@ -14,3 +14,7 @@ class DataRoots:
     user_time_read: str = "./preprocessed/user_time_read.json"
     vocab: str = "./preprocessed/tag_vocab7000.csv"
     post_id_encoder: str = "./encodings/post_id_decoding.pickle"
+
+class TFIDF:
+    tfidf: str = 'metadata_tfidf_vocab7000_aggregation.npz'
+    tag7000: str = 'tag_vocab7000.pkl'
