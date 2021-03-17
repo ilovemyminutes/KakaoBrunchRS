@@ -1,4 +1,5 @@
 # data
+encodings/*
 raw/*/*
 raw/*.csv
 preprocessed/*

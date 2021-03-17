@@ -41,7 +41,7 @@ class PostIdEncoder:
             decoder = pickle.load(handle)
         return decoder
     
-    def __load_encoder(root_dir: str):
+    def __load_encoder(self, root_dir: str):
         encoder_path = os.path.join(root_dir, 'post_id_encoding.pickle')
         with open(encoder_path, "rb") as handle:
             encoder = pickle.load(handle)
