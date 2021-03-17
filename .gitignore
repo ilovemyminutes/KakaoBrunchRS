@@ -7,6 +7,7 @@ preprocessed/*/*
 *.json
 baseline/tmp/*
 tmp/*
+tfidf/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

@@ -19,20 +19,15 @@ class PostIdEncoder:
     def transform(self, post_ids: list) -> list:
         if isinstance(post_ids, str):
             post_ids = [post_ids]
-        output = [self.__encoder[p] for p in post_ids]
 
-        if len(output) == 1:
-            return output[0]
-
+        output = [self.__encoder[p] for p in post_ids if p in self.__encoder.keys()]
         return output
     
     def inverse_transform(self, post_meta_ids: list) -> list:
         if isinstance(post_meta_ids, str):
             post_meta_ids = [post_meta_ids]
 
-        output = [self.__decoder[p] for p in post_meta_ids]
-        if len(output) == 1:
-            return output[0]
+        output = [self.__decoder[p] for p in post_meta_ids if p in self.__decoder.keys()]
         return output
 
     def __load_decoder(self, root_dir: str):
