@@ -8,6 +8,12 @@ import numpy as np
 from scipy.sparse import csr_matrix, save_npz, load_npz, vstack
 
 from utils import squeeze
+from config import Config
+
+class TFIDFGenerator:
+    def __init__(self, root_dir):
+        self.__vocab = pd.read_csv(os.path)
+
 
 
 def load_tfidf(

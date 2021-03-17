@@ -9,8 +9,8 @@ from dataclasses import dataclass
 class DataRoots:
     raw: str = "./raw"
     tfidf: str = (
-        "preprocessed/metadata_tfidf/metadata_tfidf_vocab7000_aggregation.npz"
+        "./tfidf"
     )
-    user_time_read: str = "preprocessed/user_time_read.json"
-    vocab: str = "preprocessed/tag_vocab7000.csv"
-    post_id_encoder: str = "encodings/post_id_decoding.pickle"
+    user_time_read: str = "./preprocessed/user_time_read.json"
+    vocab: str = "./preprocessed/tag_vocab7000.csv"
+    post_id_encoder: str = "./encodings/post_id_decoding.pickle"
