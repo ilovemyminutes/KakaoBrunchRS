@@ -13,5 +13,4 @@ class DataRoots:
     )
     user_time_read: str = "preprocessed/user_time_read.json"
     vocab: str = "preprocessed/tag_vocab7000.csv"
-    post_id_dec: str = "preprocessed/post_id_decoding.pickle"
-    post_id_enc: str = "preprocessed/post_id_encoding.pickle"
+    post_id_encoder: str = "encodings/post_id_decoding.pickle"
