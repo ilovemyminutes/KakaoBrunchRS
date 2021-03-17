@@ -35,6 +35,7 @@ def load_raw(name: str = "magazine", root_dir: str = Config.raw_dir):
     elif name in ["dev", "test"]:
         data = pd.read_csv(PATH[name], header=None, names=["user_private"])
 
+    # NOTE: 매우 느림. 업데이트 필요
     elif name == "read":
         try:
             data = pd.concat(
