@@ -69,30 +69,5 @@ class UserLogsGenerator:
         return self.__user_list
 
 
-# def reconstruct_reads_by_user(
-#     read_path: str = DataRoots.raw,
-#     post_enc_path: str = DataRoots.post_id_enc,
-#     save_path: str = None,
-# ) -> dict:
-#     encoder = load_post_id_encoder(encoder_dir=post_enc_path)
-#     reads = load_raw(name="read", root_dir=read_path)
-#     DATE, SEQUENCE = 0, 1
-
-#     user_list = reads["user_private"].unique().tolist()
-
-#     users_log_dict = defaultdict(list)
-#     for user_id in tqdm(user_list):
-#         logs = reads.loc[reads["user_private"] == user_id].drop(
-#             "user_private", axis=1
-#         )
-#         logs = logs.apply(lambda x: {x[DATE]: _encode_post_id_sequence(x[SEQUENCE], encoder)}, axis=1).tolist()
-#         users_log_dict[user_id].append(logs)
-
-#     if save_path:
-#         save_as_json(users_log_dict, save_path)
-#     else:
-#         return users_log_dict
-
-
 if __name__ == "__main__":
     fire.Fire({"generate": UserLogsGenerator})
