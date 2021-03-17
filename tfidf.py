@@ -1,12 +1,11 @@
 import os
 import copy
 from tqdm import tqdm
-from glob import glob
 import pickle
 
 import pandas as pd
 import numpy as np
-from scipy.sparse import csr_matrix, save_npz, load_npz, vstack
+from scipy.sparse import csr_matrix, save_npz, load_npz
 
 from utils import squeeze
 from config import Config
