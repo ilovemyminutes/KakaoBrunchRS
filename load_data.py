@@ -8,6 +8,12 @@ import pandas as pd
 from config import Config
 
 
+def load_user_time_read(root_dir: str) -> dict:
+    with open(root_dir, "r") as json_file:
+        output = json.load(json_file)
+    return output
+
+
 def load_raw(name: str = "magazine", root_dir: str = Config.raw_dir):
     PATH = {
         "magazine": os.path.join(root_dir, "magazine.json"),
@@ -62,12 +68,6 @@ def _get_read(path: str) -> pd.DataFrame:
     read["start_time"] = start_time
 
     return read[["start_time", "user_private", "sequence"]]
-
-
-def load_user_time_read(root_dir: str) -> dict:
-    with open(root_dir, "r") as json_file:
-        output = json.load(json_file)
-    return output
 
 
 # class PostIdEncoder:
