@@ -11,7 +11,7 @@ from load_data import load_user_time_read
 from preprocessing import PostIdEncoder
 from tfidf import TFIDFGenerator
 from config import Config
-from utils import save_as_pickle
+from utils import save_as_pickle, squeeze
  
 
 start = Config.train_start
@@ -48,11 +48,12 @@ def calculate_export_user_preferences(start: str=Config.train_start, end: str=Co
 
         for user_id in tqdm(dev_user_batch, desc=f'Extracting user prefereces based on {start}-{end}'):
             history = filter_read_by_time(user_time_read[user_id], start, end)
-            preference = np.zeros((1, 7000))
-            for h in history:
-                partial_tfidf = tfidf.generate(encoder.transform(h[-1]), drop_id=False)
-                preference += partial_tfidf.drop('post_meta_id', axis=1).values.sum(axis=0)
-                posts = pd.concat([posts, partial_tfidf], axis=0, ignore_index=True)
+            history = squeeze(list(map(lambda x: x[-1], history)))
+            
+            user_tfidf = tfidf.generate(encoder.transform(history), drop_id=False)
+            preference = user_tfidf.drop('post_meta_id', axis=1).values.sum(axis=0)
+
+            posts = pd.concat([posts, user_tfidf], axis=0, ignore_index=True)
             user_preferences = np.hstack([user_preferences, preference.reshape(7000, 1)])
 
         print('Postprocessing...')
