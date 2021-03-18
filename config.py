@@ -15,3 +15,6 @@ class Config:
     tfidf: str = 'metadata_tfidf_vocab7000_aggregation.npz'
     df: str = 'df_vocab7000_aggregation.pkl'
     vocab: str = 'tag_vocab7000.pkl'
+
+    train_start: str = '2018100100'
+    train_end: str = '2019022200'
