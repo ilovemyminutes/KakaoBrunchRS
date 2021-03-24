@@ -26,7 +26,7 @@ def _ndcg(recs, gt):
     return S / Q
 
 
-def _map(recs, gt, topn):
+def _map(recs, gt):
     n, ap = 0.0, 0.0
     for u, seen in six.iteritems(gt):
         seen = list(set(seen))

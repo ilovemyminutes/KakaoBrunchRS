@@ -6,20 +6,27 @@ import fire
 from load_data import load_user_time_read
 from preprocessing import PostIdEncoder
 from tfidf import TFIDFGenerator
-from utils import squeeze, load_pickle
+from utils import squeeze, load_pickle, save_as_pickle
 from config import Config
 
-
-def calculate_user_preferences(user_id_list: list=None, start: str=Config.train_start, end:str=Config.train_end, save_path: str='./recommendation_outputs/'):
+# offline task
+def calculate_user_preferences(user_id_list: str=None, start: str=Config.train_start, end:str=Config.train_end, save_path: str='./recommendation_sources/'):
     if user_id_list == 'dev':
         user_id_list = load_pickle(Config.dev_user_list)
     elif user_id_list == 'test':
         user_id_list = load_pickle(Config.test_user_list)
+    elif isinstance(user_id_list, str): # 파일 경로를 입력할 경우
+        user_id_list = load_pickle(user_id_list)
 
     print('Load calculating tools...', end='\t')
-    user_time_read = load_user_time_read(Config.user_time_read)
-    post_id_encoder = PostIdEncoder(Config.encodings_root)
-    tfidf_generator = TFIDFGenerator(Config.tfidf_root)
+    try:
+        user_time_read = load_user_time_read(Config.user_time_read)
+        post_id_encoder = PostIdEncoder(Config.encodings_root)
+        tfidf_generator = TFIDFGenerator(Config.tfidf_root)
+    except: # When import in Jupyter Notebook
+        user_time_read = load_user_time_read("../preprocessed/user_time_read.json")
+        post_id_encoder = PostIdEncoder("../encodings/")
+        tfidf_generator = TFIDFGenerator("../tfidf")
     print('loaded!')
 
     post_meta_id = [] # user_id_list의 유저들이 조회한 모든 글
@@ -28,7 +35,7 @@ def calculate_user_preferences(user_id_list: list=None, start: str=Config.train_
 
     for user_id in tqdm(user_id_list, desc=f'User Preference Extraction ({start}-{end})'):
         # 설정한 구간에 대한 해당 유저의 로그
-        history = _filter_read_by_time(user_time_read[user_id], start, end) 
+        history = filter_read_by_time(user_time_read[user_id], start, end) 
         history = squeeze(list(map(lambda x: x[-1], history)))
 
         # 유저 로그로부터 TF-IDF 행렬 생성
@@ -43,7 +50,7 @@ def calculate_user_preferences(user_id_list: list=None, start: str=Config.train_
         posts_raw.append(sparse.csr_matrix(user_tfidf.iloc[:, 1:])) # post_meta_id 컬럼을 제외하고 append -> post_meta_id 리스트를 개별적으로 생성하므로 불필요
         user_preferences_raw.append(preference)
 
-    print('Postpreprocessing...', end='\t')
+    print('Postprocessing...', end='\t')
     posts = sparse.vstack(posts_raw)
     user_preferences = sparse.hstack(user_preferences_raw)
     idf = np.array(np.log(tfidf_generator.DF.values.squeeze()) - np.log((posts != 0).sum(axis=0) + 1e-4)) # 1e-4: to prevent ZeroDivisionError
@@ -51,15 +58,20 @@ def calculate_user_preferences(user_id_list: list=None, start: str=Config.train_
     print('finished!')
 
     if save_path:
-        sparse.save_npz(os.path.join(save_path, 'posts.npz'), posts)
-        sparse.save_npz(os.path.join(save_path, 'user_preferences.npz'), user_preferences)
-        np.save(os.path.join(save_path, 'idf.npy'), idf)
-        sparse.save_npz(os.path.join(save_path, 'recommend_output.npz'), recommend_output)
+        interval = f'{start}-{end}'
+        if interval not in os.listdir(save_path):
+            os.mkdir(os.path.join(save_path, interval))
+            save_path = os.path.join(save_path, interval)
+        sparse.save_npz(os.path.join(save_path, f'({interval})recommend_output.npz'), recommend_output)
+        sparse.save_npz(os.path.join(save_path, f'({interval})user_preferences.npz'), user_preferences)
+        np.save(os.path.join(save_path, f'({interval})idf.npy'), idf)
+        sparse.save_npz(os.path.join(save_path, f'({interval})posts.npz'), posts)
+        save_as_pickle(os.path.join(save_path, f'({interval})post_meta_id.pkl'), post_meta_id)
         print(f'Saved successfully in {save_path}😎')
     else:
-        return recommend_output, user_preferences, idf, posts
+        return recommend_output, user_preferences, idf, posts, post_meta_id
         
-def _filter_read_by_time(history, start, end):
+def filter_read_by_time(history, start, end):
     history_filtered = list(filter(lambda x: (int(start) <= int(x[0].split('_')[0])) and (int(end) >= int(x[0].split('_')[-1])), history))
     return history_filtered
 

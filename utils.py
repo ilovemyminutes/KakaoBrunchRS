@@ -12,11 +12,11 @@ def load_pickle(save_path: str):
         output = pickle.load(pkl_file)
     return output
 
-def save_as_pickle(f: object, save_path: str) -> None:
+def save_as_pickle(save_path: str, f: object) -> None:
     with open(save_path, "wb") as handle:
         pickle.dump(f, handle, protocol=pickle.HIGHEST_PROTOCOL)
 
-def save_as_json(f: object, save_path: str) -> None:
+def save_as_json(save_path: str, f: object) -> None:
     with open(save_path, "w") as path:
         json.dump(
             f,

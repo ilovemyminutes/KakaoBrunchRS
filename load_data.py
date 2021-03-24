@@ -1,10 +1,7 @@
 import os
 import json
-import pickle
 from glob import glob
-
 import pandas as pd
-
 from config import Config
 
 
@@ -68,51 +65,3 @@ def _get_read(path: str) -> pd.DataFrame:
     read["start_time"] = start_time
 
     return read[["start_time", "user_private", "sequence"]]
-
-
-# class PostIdEncoder:
-#     def __init__(self, root_dir: str) -> dict:
-#         self.__encoder = self.__load_encoder(root_dir)
-#         self.__decoder = self.__load_decoder(root_dir)
-
-#     def transform(self, post_ids: list) -> list:
-#         if isinstance(post_ids, str):
-#             post_ids = [post_ids]
-#         output = [self.__encoder[p] for p in post_ids]
-
-#         if len(output) == 1:
-#             return output[0]
-
-#         return output
-    
-#     def inverse_transform(self, post_meta_ids: list) -> list:
-#         if isinstance(post_meta_ids, str):
-#             post_meta_ids = [post_meta_ids]
-
-#         output = [self.__decoder[p] for p in post_meta_ids]
-#         if len(output) == 1:
-#             return output[0]
-#         return output
-
-#     def __load_decoder(self, root_dir: str):
-#         decoder_path = os.path.join(root_dir, 'post_id_decoding.pickle')
-#         with open(decoder_path, "rb") as handle:
-#             decoder = pickle.load(handle)
-#         return decoder
-    
-#     def __load_encoder(root_dir: str):
-#         encoder_path = os.path.join(root_dir, 'post_id_encoding.pickle')
-#         with open(encoder_path, "rb") as handle:
-#             encoder = pickle.load(handle)
-#         return encoder
-        
-# def load_post_id_encoder(encoder_dir: str) -> dict:
-#     with open(encoder_dir, "rb") as handle:
-#         post_id_encoder = pickle.load(handle)
-#     return post_id_encoder
-
-# def load_post_id_decoder(decoder_dir: str) -> dict:
-#     with open(decoder_dir, "rb") as handle:
-#         post_id_decoder = pickle.load(handle)
-#     return post_id_decoder
-

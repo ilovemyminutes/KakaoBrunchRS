@@ -1,10 +1,5 @@
 from dataclasses import dataclass
 
-# data_root = "./raw"
-# tfidf_root = '../raw/preprocessed/metadata_tfidf'
-# vocab_root = '../raw/preprocessed/tag_vocab7000.csv'
-
-
 @dataclass
 class Config:
     raw_dir: str = "./raw"
@@ -23,3 +18,6 @@ class Config:
 
     dev_user_list: str='./user_id_lists/dev.pkl'
     test_user_list: str='./user_id_lists/test.pkl'
+
+    recommend_src: str='./recommendation_sources/2018100100-2019022200'
+    output_root: str='./output'

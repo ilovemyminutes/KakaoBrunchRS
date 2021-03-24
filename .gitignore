@@ -8,6 +8,9 @@ preprocessed/*/*
 baseline/tmp/*
 tmp/*
 tfidf/*
+recommendation_sources/*
+recommendation_sources/*/*
+user_id_lists/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
