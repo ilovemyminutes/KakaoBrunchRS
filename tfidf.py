@@ -1,42 +1,85 @@
 import os
 import copy
 from tqdm import tqdm
-from glob import glob
+import pickle
 
 import pandas as pd
 import numpy as np
-from scipy.sparse import csr_matrix, save_npz, load_npz, vstack
+from scipy.sparse import csr_matrix, save_npz, load_npz
 
 from utils import squeeze
+from config import Config
 
 
-def load_tfidf(
-    post_meta_id_list: list, tfidf_dir: str, vocab_dir: str, drop_id: bool = True
-) -> pd.DataFrame:
-    """tfidf 데이터프레임을 불러오는 함수
+class TFIDFGenerator:
+    def __init__(self, root_dir: str=Config.tfidf_root):
+        self.__vocab = self.__load_vocab(root_dir)
+        self.__tfidf = self.__load_tfidf(root_dir)
+        self.__df = self.__load_df(root_dir)
+        self.__columns = ["post_meta_id"] + self.__vocab
 
-    Args:
-        tfidf_dir (str): tfidf가 저장된 디렉토리
-        vocab_dir (str): vocabulary가 저장된 디렉토리
-        post_meta_id_list (list): tfidf 벡터를 추출할 post_meta_id 리스트
+    def generate(self, post_meta_id_list: list, drop_id: bool=True) -> pd.DataFrame:
+        """tfidf 데이터프레임을 생성하는 함수. 일부 글에 대한 TF-IDF 행렬을 생성하는 것이 가능
 
-    Returns:
-        pd.DataFrame: [description]
-    """
-    if isinstance(post_meta_id_list, int):
-        post_meta_id_list = [post_meta_id_list]
+        Args:
+            post_meta_id_list (list): TF-IDF 벡터를 추출할 post_meta_id 리스트
+            drop_id (bool): True시 post_meta_id 컬럼을 제거
 
-    tfidf = load_npz(tfidf_dir)
-    vocab = pd.read_csv(vocab_dir)["tag"].tolist()
-    columns = ["post_meta_id"] + vocab
+        Returns:
+            pd.DataFrame: 입력한 글 각각에 대한 TF-IDF 벡터를 담은 데이터프레임
+        """
+        output = pd.DataFrame(self.__tfidf[post_meta_id_list, :].todense(), columns=self.__columns)
 
-    output = pd.DataFrame(tfidf[post_meta_id_list, :].todense(), columns=columns)
-    if drop_id:
-        output.drop("post_meta_id", axis=1, inplace=True)
-    else:
-        output["post_meta_id"] = output["post_meta_id"].astype(int)
+        if drop_id:
+            output.drop("post_meta_id", axis=1, inplace=True)
+        else:
+            output["post_meta_id"] = output["post_meta_id"].astype(int)
+        return output
 
-    return output
+    def __load_df(self, root_dir):
+        fpath = os.path.join(root_dir, Config.df)
+        with open(fpath, 'rb') as df7000:
+            df = pickle.load(df7000)
+        return df
+
+    def __load_tfidf(self, root_dir):
+        fpath = os.path.join(root_dir, Config.tfidf)
+        tfidf = load_npz(fpath)
+        return tfidf
+
+    def __load_vocab(self, root_dir):
+        fpath = os.path.join(root_dir, Config.vocab)
+        with open(fpath, "rb") as tag7000:
+            vocab = pickle.load(tag7000)
+        return vocab
+    
+    @property
+    def TFIDF(self):
+        return self.__tfidf
+
+    @property
+    def DF(self):
+        df = pd.DataFrame(self.__df).T
+        df.columns = self.__vocab
+        return df
+
+    @property
+    def Vocab(self):
+        return self.__vocab
+
+
+def get_df(batch: pd.DataFrame, vocab: list) -> pd.DataFrame:
+    vocab_size = len(vocab)
+    df = pd.DataFrame(np.zeros((1, vocab_size)), columns=vocab)
+    kwd_list = set(squeeze(batch["keyword_list"].tolist()))
+    kwd_list_filtered = list(filter(lambda x: x in vocab, kwd_list))
+
+    pbar = tqdm(kwd_list_filtered)
+    pbar.set_description("Getting DF")
+    for tag in pbar:
+        if tag in vocab:
+            df[tag] = sum(batch["keyword_list"].apply(lambda x: tag in x))
+    return df
 
 
 def get_tfidf(
@@ -44,7 +87,6 @@ def get_tfidf(
     vocab: list,
     indices: list = None,
     save_path: str = None,
-    encoding: str = "euc-kr",
 ) -> pd.DataFrame:
     """tf-idf matrix를 리턴하는 함수. 서브샘플링을 통해 일부 데이터셋에 대해서만 tf-idf를 구할 수 있음
     tf-idf 방식
@@ -177,5 +219,26 @@ def _sparkle(row: pd.DataFrame, batch: pd.DataFrame, vocab: list):
 #             output = output.append(tfidf, ignore_index=True)
 #     else:
 #         raise NotImplementedError()
+
+#     return output
+
+
+# deprecated
+# def load_tfidf(
+#     post_meta_id_list: list, tfidf_dir: str, vocab_dir: str, drop_id: bool = True
+# ) -> pd.DataFrame:
+    
+#     if isinstance(post_meta_id_list, int):
+#         post_meta_id_list = [post_meta_id_list]
+
+#     tfidf = load_npz(tfidf_dir)
+#     vocab = pd.read_csv(vocab_dir)["tag"].tolist()
+#     columns = ["post_meta_id"] + vocab
+
+#     output = pd.DataFrame(tfidf[post_meta_id_list, :].todense(), columns=columns)
+#     if drop_id:
+#         output.drop("post_meta_id", axis=1, inplace=True)
+#     else:
+#         output["post_meta_id"] = output["post_meta_id"].astype(int)
 
 #     return output

@@ -2,17 +2,19 @@ import os
 import ast
 import json
 import pickle
+from config import Config
 
-from config import DataRoots
 
 LENGTH = len("YYYYMMDDHH_YYYYMMDDHH")
 
+def load_pickle(save_path: str):
+    with open(save_path, "rb") as pkl_file:
+        output = pickle.load(pkl_file)
+    return output
 
 def save_as_pickle(f: object, save_path: str) -> None:
     with open(save_path, "wb") as handle:
         pickle.dump(f, handle, protocol=pickle.HIGHEST_PROTOCOL)
-    print(f"{f} saved in {save_path} successfuly.")
-
 
 def save_as_json(f: object, save_path: str) -> None:
     with open(save_path, "w") as path:
@@ -21,8 +23,7 @@ def save_as_json(f: object, save_path: str) -> None:
             path,
         )
 
-
-def iterate_data_files(from_dtm, to_dtm, root_dir: str = DataRoots.raw):
+def iterate_data_files(from_dtm, to_dtm, root_dir: str = Config.raw_dir):
     from_dtm, to_dtm = map(str, [from_dtm, to_dtm])
     read_root = os.path.join(root_dir, "read")
     for fname in os.listdir(read_root):
