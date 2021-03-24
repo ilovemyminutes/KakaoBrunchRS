@@ -12,7 +12,7 @@ from config import Config
 
 
 class TFIDFGenerator:
-    def __init__(self, root_dir: str=Config.tfidf_dir):
+    def __init__(self, root_dir: str=Config.tfidf_root):
         self.__vocab = self.__load_vocab(root_dir)
         self.__tfidf = self.__load_tfidf(root_dir)
         self.__df = self.__load_df(root_dir)

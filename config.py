@@ -20,3 +20,6 @@ class Config:
     train_end: str= '2019022200'
     dev_start: str= '2019022200'
     dev_end: str= '2019030100'
+
+    dev_user_list: str='./user_id_lists/dev.pkl'
+    test_user_list: str='./user_id_lists/test.pkl'
