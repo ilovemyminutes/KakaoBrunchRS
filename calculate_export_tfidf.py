@@ -1,12 +1,8 @@
 import os
-import pickle
-import pandas as pd
-
 import fire
-
 from tfidf import get_tfidf, get_df
 from load_data import load_raw
-from utils import save_as_pickle
+from utils import save_as_pickle, load_pickle
 from config import Config
 
 
@@ -19,8 +15,7 @@ def get_save_tfidf(
     save_dir="test",
 ):
     metadata = load_raw(name="metadata", root_dir=root_dir)
-    with open(vocab_path, "rb") as tag7000:
-        vocab = pickle.load(tag7000)
+    vocab = load_pickle(vocab_path)
 
     # TF-IDF를 분할저장. 코랩 프로 기준 전체 metadata로 TFIDF를 구할 경우 killed 현상이 발생
     if n_splits:
@@ -47,10 +42,9 @@ def get_save_tfidf(
         get_tfidf(data=metadata, vocab=vocab, save_path=save_path)
 
 
-def get_save_df(root_dir: str=Config.raw_dir):
+def get_save_df(root_dir: str=Config.raw_dir, vocab_path:str=VOCAB_PATH):
     metadata = load_raw('metadata', root_dir)
-    with open(VOCAB_PATH, "rb") as tag7000:
-        vocab = pickle.load(tag7000)
+    vocab = load_pickle(vocab_path)
     df = get_df(metadata, vocab)
     save_as_pickle(df.values.squeeze().tolist(), '../tfidf/df_vocab7000_aggregation.pkl')
 

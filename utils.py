@@ -2,11 +2,15 @@ import os
 import ast
 import json
 import pickle
-
 from config import Config
+
 
 LENGTH = len("YYYYMMDDHH_YYYYMMDDHH")
 
+def load_pickle(save_path: str):
+    with open(save_path, "rb") as pkl_file:
+        output = pickle.load(pkl_file)
+    return output
 
 def save_as_pickle(f: object, save_path: str) -> None:
     with open(save_path, "wb") as handle:
@@ -20,7 +24,6 @@ def save_as_json(f: object, save_path: str) -> None:
             f,
             path,
         )
-
 
 def iterate_data_files(from_dtm, to_dtm, root_dir: str = Config.raw_dir):
     from_dtm, to_dtm = map(str, [from_dtm, to_dtm])
