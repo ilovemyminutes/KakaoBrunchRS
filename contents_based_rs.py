@@ -20,7 +20,7 @@ def recommend(recommend_src: str=Config.recommend_src, output_root: str=Config.o
     print('loaded!')
 
     with open(os.path.join(output_root, 'recommend.txt'), 'w') as file:
-        for idx in tqdm(range(len(post_meta_id)), desc='Generate Recommendations'):
+        for idx in tqdm(range(len(user_id_list)), desc='Generate Recommendations'):
             user_id = user_id_list[idx]
             
             seens = filter_read_by_time(user_time_read[user_id], start=Config.train_start, end=Config.train_end)
@@ -33,6 +33,7 @@ def recommend(recommend_src: str=Config.recommend_src, output_root: str=Config.o
             
             file.write(f'{user_id} ')
             file.write(f"{' '.join(recommend)}\n")
+            
     print(f"Saved 'recommend.txt' in {output_root}")
 
 
