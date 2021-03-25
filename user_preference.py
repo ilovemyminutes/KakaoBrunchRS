@@ -10,7 +10,7 @@ from utils import squeeze, load_pickle, save_as_pickle
 from config import Config
 
 # offline task
-def calculate_user_preferences(user_id_list: str=None, start: str=Config.train_start, end:str=Config.train_end, save_path: str='./recommendation_sources/'):
+def calculate_user_preferences(user_id_list: str=None, start: str=Config.train_start, end:str=Config.train_end, save_path: str='./dev_recommendation_sources/'):
     if user_id_list == 'dev':
         user_id_list = load_pickle(Config.dev_user_list)
     elif user_id_list == 'test':
@@ -62,11 +62,11 @@ def calculate_user_preferences(user_id_list: str=None, start: str=Config.train_s
         if interval not in os.listdir(save_path):
             os.mkdir(os.path.join(save_path, interval))
             save_path = os.path.join(save_path, interval)
-        sparse.save_npz(os.path.join(save_path, f'({interval})recommend_output.npz'), recommend_output)
-        sparse.save_npz(os.path.join(save_path, f'({interval})user_preferences.npz'), user_preferences)
-        np.save(os.path.join(save_path, f'({interval})idf.npy'), idf)
-        sparse.save_npz(os.path.join(save_path, f'({interval})posts.npz'), posts)
-        save_as_pickle(os.path.join(save_path, f'({interval})post_meta_id.pkl'), post_meta_id)
+        sparse.save_npz(os.path.join(save_path, f'recommend_output.npz'), recommend_output)
+        sparse.save_npz(os.path.join(save_path, f'user_preferences.npz'), user_preferences)
+        np.save(os.path.join(save_path, f'idf.npy'), idf)
+        sparse.save_npz(os.path.join(save_path, f'posts.npz'), posts)
+        save_as_pickle(os.path.join(save_path, f'post_meta_id.pkl'), post_meta_id)
         print(f'Saved successfully in {save_path}😎')
     else:
         return recommend_output, user_preferences, idf, posts, post_meta_id

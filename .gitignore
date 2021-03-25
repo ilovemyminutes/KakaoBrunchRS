@@ -10,6 +10,8 @@ tmp/*
 tfidf/*
 recommendation_sources/*
 recommendation_sources/*/*
+dev_recommendation_sources/*
+dev_recommendation_sources/*/*
 user_id_lists/*
 
 # Byte-compiled / optimized / DLL files
