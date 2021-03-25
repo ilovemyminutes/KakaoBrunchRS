@@ -1,4 +1,30 @@
 # Kakao Arena Brunch Posts Recommendation System
+
+## Contents-based Recommender System
+### Post Feature: TF-IDF
+- `metadata`의 태그 정보를 바탕으로 TF-IDF 행렬을 생성하여 글 각각의 feature vector를 얻음
+- `TF` type: boolean(글에 해당 태그가 등장할 경우 1, 그렇지 않을 경우 0)
+- `IDF` type: logarithm
+```python
+>>> python3 calculate_export_tfidf.py tfidf --root-dir './raw' --vocab-path './tfidf'
+>>> python3 calculate_export_tfidf.py df --root-dir './raw' --vocab-path './tfidf'
+```
+
+### User Preference
+- 유저 각각이 과거에 조회했던 글들의 feature vector를 바탕으로 유저의 feature vector를 얻음
+- 유저가 일정 기간동안 조회한 글들의 TF-IDF 벡터를 가중합
+    - DF를 가중치로 활용
+```python
+>>> python3 user_preference.py run --user-id-list 'dev' --start 2019022200 --end 2019022200 --save-path './dev_recommendation_sources/'
+```
+
+### Recommendation
+- 유저 feature vector에 가장 부합하는 글들을 추천
+- 유저 feature vector와 각 글들의 feature vector를 내적, 값이 가장 높은 순서대로 100개의 글을 추천
+- 단, 유저가 이미 조회한 글은 추천에서 제외
+```python
+>>> python3 contents_based_rs.py run --recommend-src './recommendation_sources/2018100100-2019022200' --output-root './output'
+
 ### Ongoing
 ![](https://github.com/iloveslowfood/KakaoBrunchRS/blob/main/images/structure.jpg?raw=true)
 
