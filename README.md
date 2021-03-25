@@ -3,13 +3,13 @@
 ## Contents-based Recommender System
 ### Post Feature: TF-IDF
 - `metadata`의 태그 정보를 바탕으로 TF-IDF 행렬을 생성하여 글 각각의 feature vector를 얻음
-    - 8만 여 개의 태그 정보 중, 가장 빈도수가 높은 상위 7000개의 태그가 모든 빈도의 약 85%를 차지하여, 7000개 태그만을 활용
+    - 8만 여 개의 태그 정보 중, 가장 빈도수가 높은 상위 7000개의 태그가 모든 빈도의 약 85%를 차지 => 7000개 태그만을 TF-IDF 생성에 활용
     ![](https://github.com/iloveslowfood/KakaoBrunchRS/blob/main/images/%ED%83%9C%EA%B7%B8%EB%88%84%EC%A0%81%EB%B6%84%ED%8F%AC.png?raw=true)
 - `TF` type: boolean(글에 해당 태그가 등장할 경우 1, 그렇지 않을 경우 0)
 - `IDF` type: logarithm
 ```python
->>> python3 calculate_export_tfidf.py tfidf --root-dir './raw' --vocab-path './tfidf'
->>> python3 calculate_export_tfidf.py df --root-dir './raw' --vocab-path './tfidf'
+>>> python3 calculate_export_tfidf.py tfidf --root-dir './raw' --vocab-path './tfidf' # TF-IDF 행렬 생성
+>>> python3 calculate_export_tfidf.py df --root-dir './raw' --vocab-path './tfidf' # DF 행렬 생성
 ```
 
 ### User Preference
@@ -26,7 +26,11 @@
 - 단, 유저가 이미 조회한 글은 추천에서 제외
 ```python
 >>> python3 contents_based_rs.py run --recommend-src './recommendation_sources/2018100100-2019022200' --output-root './output'
-
+```
+### Reference
+- Wikipedia, 'tf-idf', https://en.wikipedia.org/wiki/Tf%E2%80%93idf 
+- Charu C. Aggarwal, 2016, 'Recommender Systems', https://link.springer.com/book/10.1007/978-3-319-29659-3
+- SHUVAYAN, 2015, 'Beginners Guide to Learn about Content Based Recommender Engines', https://www.analyticsvidhya.com/blog/2015/08/beginners-guide-learn-content-based-recommender-systems/
 ### Ongoing
 ![](https://github.com/iloveslowfood/KakaoBrunchRS/blob/main/images/structure.jpg?raw=true)
 
