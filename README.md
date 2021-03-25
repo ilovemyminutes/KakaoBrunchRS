@@ -3,6 +3,8 @@
 ## Contents-based Recommender System
 ### Post Feature: TF-IDF
 - `metadata`의 태그 정보를 바탕으로 TF-IDF 행렬을 생성하여 글 각각의 feature vector를 얻음
+    - 8만 여 개의 태그 정보 중, 가장 빈도수가 높은 상위 7000개의 태그가 모든 빈도의 약 85%를 차지하여, 7000개 태그만을 활용
+    ![](https://github.com/iloveslowfood/KakaoBrunchRS/blob/main/images/%ED%83%9C%EA%B7%B8%EB%88%84%EC%A0%81%EB%B6%84%ED%8F%AC.png?raw=true)
 - `TF` type: boolean(글에 해당 태그가 등장할 경우 1, 그렇지 않을 경우 0)
 - `IDF` type: logarithm
 ```python
